@@ -67,6 +67,7 @@ class Diamond:
 
         pygame.init()
         self.screen = pygame.display.set_mode([SCREEN_SIZE, SCREEN_SIZE])
+        self.font = pygame.font.SysFont(pygame.font.get_default_font(), 32)
         self.clock = pygame.time.Clock()
 
         self.grid_rects = None
@@ -168,6 +169,7 @@ class Diamond:
         self.blank_screen()
         self.draw_grid()
         self.draw_tiles()
+        self.draw_annotations()
         pygame.display.flip()
 
     def handle_events(self):
@@ -203,3 +205,7 @@ class Diamond:
 
     def draw_tiles(self):
         [tile.draw(self.screen) for tile in self.tiles]
+
+    def draw_annotations(self):
+        label = self.font.render(f'A({self.order})', True, (0, ) * 3)
+        self.screen.blit(label, np.array([SCREEN_SIZE, 0]).astype(int) + [-label.get_width(), 0])

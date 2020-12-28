@@ -3,8 +3,8 @@ import numpy as np
 import pygame
 
 SCREEN_SIZE = 800
-BACKGROUND_COLOR = (200, 200, 200)
-BORDER_COLOR = (0, 0, 0)
+BACKGROUND_COLOR = (20, ) * 3
+BORDER_COLOR = (0, ) * 3
 BORDER_WIDTH = 2
 ORIENTATIONS = N, S, E, W = range(4)
 TILE_COLORS = {
@@ -12,6 +12,7 @@ TILE_COLORS = {
     S: (119, 172, 48),  # green
     E: (162, 20, 47),  # red
     W: (237, 177, 32),  # yellow
+    None: (200, ) * 3
 }
 TILE_STEPS = {
     N: np.array([-1, 0]),
@@ -180,6 +181,10 @@ class Diamond:
         self.screen.fill(BACKGROUND_COLOR)
 
     def draw_grid(self):
+        [
+            pygame.draw.rect(self.screen, rect=rect, color=TILE_COLORS[None])
+            for rect in self.grid_rects
+        ]
         pygame.draw.line(
             self.screen,
             color=BORDER_COLOR,
@@ -206,5 +211,5 @@ class Diamond:
                              color=BORDER_COLOR, width=BORDER_WIDTH if self.order < 90 else 1)
 
     def draw_annotations(self):
-        label = self.font.render(f'A({self.order})', True, (0, ) * 3)
+        label = self.font.render(f'A({self.order})', True, TILE_COLORS[None])
         self.screen.blit(label, np.array([SCREEN_SIZE, 0]).astype(int) + [-label.get_width(), 0])

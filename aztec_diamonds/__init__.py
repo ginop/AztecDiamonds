@@ -40,18 +40,14 @@ class Domino:
     def gen_rect(self, order):
         grid_size = SCREEN_SIZE / 2 / (order + 1)
         self.rect = pygame.Rect(
-            grid_size * (order + 1 + self.upper_left_corner[1]),  # top
-            grid_size * (order + 1 + self.upper_left_corner[0]),  # left
-            grid_size * (2 if self.orientation in (N, S) else 1),  # height
-            grid_size * (1 if self.orientation in (N, S) else 2),  # width
+            round(grid_size * (order + 1 + self.upper_left_corner[1])),  # top
+            round(grid_size * (order + 1 + self.upper_left_corner[0])),  # left
+            round(grid_size * (2 if self.orientation in (N, S) else 1)),  # height
+            round(grid_size * (1 if self.orientation in (N, S) else 2)),  # width
         )
 
     def step(self):
         self.upper_left_corner += TILE_STEPS[self.orientation]
-
-    def draw(self, screen):
-        pygame.draw.rect(screen, rect=self.rect, color=TILE_COLORS[self.orientation])
-        pygame.draw.rect(screen, rect=self.rect, color=BORDER_COLOR, width=BORDER_WIDTH)
 
 
 class Diamond:
@@ -84,10 +80,10 @@ class Diamond:
     def generate_grid_rects(self):
         self.grid_rects = [
             pygame.Rect(
-                SCREEN_SIZE / 2 * (i + 1) / (self.order + 1),  # left
-                SCREEN_SIZE / 2 * (1 - (i + 1) / (self.order + 1)),  # top
-                SCREEN_SIZE * (self.order - i) / (self.order + 1),  # width
-                SCREEN_SIZE * (i + 1) / (self.order + 1),  # height
+                round(SCREEN_SIZE / 2 * (i + 1) / (self.order + 1)),  # left
+                round(SCREEN_SIZE / 2 * (1 - (i + 1) / (self.order + 1))),  # top
+                round(SCREEN_SIZE * (self.order - i) / (self.order + 1)),  # width
+                round(SCREEN_SIZE * (i + 1) / (self.order + 1)),  # height
             )
             for i in range(self.order)
         ]
@@ -187,24 +183,27 @@ class Diamond:
         pygame.draw.line(
             self.screen,
             color=BORDER_COLOR,
-            start_pos=(SCREEN_SIZE / 2 / (self.order + 1), SCREEN_SIZE / 2),
-            end_pos=(SCREEN_SIZE / 2 * (1 + self.order / (self.order + 1)), SCREEN_SIZE / 2),
-            width=BORDER_WIDTH
+            start_pos=(round(SCREEN_SIZE / 2 / (self.order + 1)), round(SCREEN_SIZE / 2)),
+            end_pos=(round(SCREEN_SIZE / 2 * (1 + self.order / (self.order + 1))), round(SCREEN_SIZE / 2)),
+            width=BORDER_WIDTH if self.order < 90 else 1
         )
         pygame.draw.line(
             self.screen,
             color=BORDER_COLOR,
-            start_pos=(SCREEN_SIZE / 2, SCREEN_SIZE / 2 / (self.order + 1)),
-            end_pos=(SCREEN_SIZE / 2, SCREEN_SIZE / 2 * (1 + self.order / (self.order + 1))),
-            width=BORDER_WIDTH
+            start_pos=(round(SCREEN_SIZE / 2), round(SCREEN_SIZE / 2 / (self.order + 1))),
+            end_pos=(round(SCREEN_SIZE / 2), round(SCREEN_SIZE / 2 * (1 + self.order / (self.order + 1)))),
+            width=BORDER_WIDTH if self.order < 90 else 1
         )
         [
-            pygame.draw.rect(self.screen, rect=rect, color=BORDER_COLOR, width=BORDER_WIDTH)
+            pygame.draw.rect(self.screen, rect=rect, color=BORDER_COLOR, width=BORDER_WIDTH if self.order < 90 else 1)
             for rect in self.grid_rects
         ]
 
     def draw_tiles(self):
-        [tile.draw(self.screen) for tile in self.tiles]
+        for tile in self.tiles:
+            pygame.draw.rect(self.screen, rect=tile.rect, color=TILE_COLORS[tile.orientation])
+            pygame.draw.rect(self.screen, rect=tile.rect,
+                             color=BORDER_COLOR, width=BORDER_WIDTH if self.order < 90 else 1)
 
     def draw_annotations(self):
         label = self.font.render(f'A({self.order})', True, (0, ) * 3)

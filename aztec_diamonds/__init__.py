@@ -114,22 +114,21 @@ class Diamond:
         [tile.gen_rect(order=self.order) for tile in self.tiles]
 
     def cancel_opposing_movers(self):
-        for i in range(2 * self.order):
-            for j in range(2 * self.order):
-                tile = self.tiling[i, j]
-                if tile == 0:
-                    continue
-                i2, j2 = np.array([i, j]) + TILE_STEPS[tile.orientation]
-                if not (0 <= i2 <= 2 * self.order and 0 <= j2 <= 2 * self.order):
-                    continue
-                tile2 = self.tiling[i2, j2]
-                if tile2 == 0:
-                    continue
-                if tile2.orientation == TILE_STEP_CONFLICTS[tile.orientation]:
-                    self.tiling[np.where(self.tiling == tile)] = 0
-                    self.tiling[np.where(self.tiling == tile2)] = 0
-                    self.tiles.remove(tile)
-                    self.tiles.remove(tile2)
+        for i, j in zip(*np.where(self.diamond)):
+            tile = self.tiling[i, j]
+            if tile == 0:
+                continue
+            i2, j2 = np.array([i, j]) + TILE_STEPS[tile.orientation]
+            if not (0 <= i2 <= 2 * self.order and 0 <= j2 <= 2 * self.order):
+                continue
+            tile2 = self.tiling[i2, j2]
+            if tile2 == 0:
+                continue
+            if tile2.orientation == TILE_STEP_CONFLICTS[tile.orientation]:
+                self.tiling[np.where(self.tiling == tile)] = 0
+                self.tiling[np.where(self.tiling == tile2)] = 0
+                self.tiles.remove(tile)
+                self.tiles.remove(tile2)
 
     def move_tiles(self):
         self.tiling = np.zeros([2 * self.order] * 2, dtype='O')
